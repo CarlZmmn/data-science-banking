@@ -40,6 +40,8 @@ def bewerten(name, y_true, y_pred, y_score=None):
                          index=['true: zahlt', 'true: Ausfall'],
                          columns=['pred.: zahlt', 'pred.: Ausfall']))
     print()
+
+
 def trainieren_und_bewerten(name, model, X_train, y_train, X_test, y_test):
     start = time.perf_counter()
     model.fit(X_train, y_train)
