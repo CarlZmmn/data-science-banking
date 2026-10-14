@@ -22,12 +22,17 @@ def bewerten(name, y_true, y_pred, y_score=None):
     genehmigt = tn + fn
     genehmigungsquote = genehmigt / len(y_true)
     ausfall_genehmigt = fn / genehmigt if genehmigt > 0 else float('nan')
+    abgelehnt = tp + fp
+    ablehnung_unnoetig = fp / abgelehnt if abgelehnt > 0 else float('nan')   # Anteil der Abgelehnten, die gezahlt hätten
+    gute_verloren = fp / (tn + fp) if (tn + fp) > 0 else float('nan')        # Anteil aller guten Kunden, die abgelehnt wurden
     ziel = 'erreicht' if ausfall_genehmigt < ZIEL_AUSFALLQUOTE else 'nicht erreicht'
 
     print(f'{name}')
     print(f'Genehmigungsquote {genehmigungsquote:.1%} | Ausfallquote genehmigt {ausfall_genehmigt:.1%} '
          #f'→ Ziel < {ZIEL_AUSFALLQUOTE:.0%} {ziel}'
           )
+    print(f'Abgelehnt, hätten aber gezahlt: {fp} von {abgelehnt} Ablehnungen ({ablehnung_unnoetig:.1%}) '
+          f'| {gute_verloren:.1%} aller guten Kunden abgelehnt')
     print(f'Fehlerquote {1 - accuracy:.1%} | erkannte Ausfälle {recall:.1%}')
     print(f'\nAccuracy {accuracy:.3f}\nPrecision {precision:.3f}\nRecall {recall:.3f}'
           f'\nF1 {f1:.3f}\nMCC {mcc:.3f}' + (f'\nROC AUC {roc_auc:.3f}' if roc_auc is not None else ''))
