@@ -33,8 +33,9 @@ def bewerten(name, y_true, y_pred, y_score=None):
           )
     print(f'Abgelehnt, hätten aber gezahlt: {fp} von {abgelehnt} Ablehnungen ({ablehnung_unnoetig:.1%}) '
           f'| {gute_verloren:.1%} aller guten Kunden abgelehnt')
-    print(f'Fehlerquote {1 - accuracy:.1%} | erkannte Ausfälle {recall:.1%}')
-    print(f'\nAccuracy {accuracy:.3f}\nPrecision {precision:.3f}\nRecall {recall:.3f}'
+    print(
+        f'erkannte Ausfälle {recall:.1%}')
+    print(f'\nPrecision {precision:.3f}\nRecall {recall:.3f}'
           f'\nF1 {f1:.3f}\nMCC {mcc:.3f}' + (f'\nROC AUC {roc_auc:.3f}' if roc_auc is not None else ''))
     display(pd.DataFrame(cm,
                          index=['true: zahlt', 'true: Ausfall'],
