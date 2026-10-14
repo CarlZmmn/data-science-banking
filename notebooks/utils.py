@@ -2,6 +2,8 @@ import pandas as pd
 from IPython.display import display
 from sklearn.metrics import (accuracy_score, precision_score, recall_score, f1_score,
                              matthews_corrcoef, roc_auc_score, confusion_matrix)
+import time
+import pickle
 
 ZIEL_AUSFALLQUOTE = 0.085   # max. Anteil Ausfälle unter den genehmigten Krediten
 
@@ -33,3 +35,25 @@ def bewerten(name, y_true, y_pred, y_score=None):
                          index=['true: zahlt', 'true: Ausfall'],
                          columns=['pred.: zahlt', 'pred.: Ausfall']))
     print()
+def trainieren_und_bewerten(name, model, X_train, y_train, X_test, y_test):
+    start = time.perf_counter()
+    model.fit(X_train, y_train)
+    zeit_fit = time.perf_counter() - start                          # Trainingszeit in Sekunden
+
+    start = time.perf_counter()
+    y_pred = model.predict(X_test)
+    zeit_predict = time.perf_counter() - start                      # Vorhersagezeit für das ganze Testset
+
+    if hasattr(model, 'predict_proba'):                             # Wahrscheinlichkeiten für ROC AUC
+        y_score = model.predict_proba(X_test)[:, 1]
+    elif hasattr(model, 'decision_function'):                       # z. B. SVC ohne probability=True
+        y_score = model.decision_function(X_test)
+    else:
+        y_score = None
+
+    groesse_mb = len(pickle.dumps(model)) / 1e6                     # Speicherbedarf des trainierten Modells
+
+    bewerten(name, y_test, y_pred, y_score)
+    print(f'Ressourcen | Training {zeit_fit:.2f} s | Vorhersage {zeit_predict * 1000:.0f} ms '
+          f'({zeit_predict / len(X_test) * 1e6:.1f} µs pro Person) | Modellgröße {groesse_mb:.2f} MB\n')
+    return model
